@@ -1,1237 +1,149 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>A Incrível Máquina de Orçamentos · miligrama. 2026</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
-<style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  :root {
-    --bg: #E8E8E6;
-    --surface: #F2F2F0;
-    --white: #FAFAF8;
-    --ink: #1A1A18;
-    --muted: #666662;
-    --border: #1A1A18;
-    --serif: 'Playfair Display', Georgia, serif;
-    --mono: 'IBM Plex Mono', monospace;
-    --sans: 'IBM Plex Sans', sans-serif;
-    --green: #1e5c35;
-    --red: #7a1515;
-    --yellow-bg: #F7F2DC;
-    --yellow-accent: #b8860b;
-    --green-bg: #E8F4ED;
-    --green-acc: #1E5C35;
-    --blue-bg: #E8EEF8;
-    --blue-acc: #1A3A7A;
-    --purple-bg: #F0EAF8;
-    --purple-acc: #4A1A7A;
-    --red-bg: #F8EAEA;
-    --red-acc: #7A1515;
-  }
-
-  html { scroll-behavior: smooth; }
-
-  body {
-    background: var(--bg);
-    font-family: var(--sans);
-    color: var(--ink);
-    min-height: 100vh;
-    font-size: 14px;
-    line-height: 1.5;
-  }
-
-  /* ─── HEADER / TABS ─── */
-  .tab-bar {
-    background: var(--ink);
-    display: flex;
-    align-items: stretch;
-    padding: 0 3rem;
-    gap: 0;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-
-  .tab-bar h1 {
-    font-family: var(--serif);
-    font-size: 1.15rem;
-    font-weight: 900;
-    color: var(--bg);
-    padding: 1.1rem 2rem 1.1rem 0;
-    margin-right: 1.5rem;
-    border-right: 1px solid rgba(255,255,255,0.12);
-    white-space: nowrap;
-    text-decoration: underline;
-    text-underline-offset: 5px;
-    text-decoration-thickness: 1.5px;
-    letter-spacing: -0.01em;
-  }
-
-  .tab {
-    font-family: var(--mono);
-    font-size: 0.67rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: rgba(255,255,255,0.4);
-    padding: 0 1.5rem;
-    cursor: pointer;
-    border-bottom: 3px solid transparent;
-    display: flex;
-    align-items: center;
-    transition: color .15s, border-color .15s;
-    user-select: none;
-  }
-
-  .tab:hover { color: rgba(255,255,255,0.7); }
-  .tab.active { color: #fff; border-bottom-color: #fff; }
-
-  .tab-byline {
-    font-family: var(--mono);
-    font-size: 0.6rem;
-    color: rgba(255,255,255,0.25);
-    margin-left: auto;
-    display: flex;
-    align-items: center;
-    letter-spacing: 0.06em;
-  }
-
-  /* ─── PANELS ─── */
-  .panel { display: none; padding: 2.5rem 3rem 6rem; }
-  .panel.active { display: block; }
-
-  /* ─── SETUP GRID ─── */
-  .setup-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 1.5rem;
-    max-width: 1200px;
-  }
-
-  .setup-col-right {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-  }
-
-  /* ─── CALC GRID ─── */
-  .calc-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr 2fr;
-    gap: 1.5rem;
-    max-width: 1200px;
-    align-items: start;
-  }
-
-  /* ─── CARD ─── */
-  .card {
-    background: var(--white);
-    border: 1.5px solid var(--border);
-    padding: 1.75rem 2rem;
-  }
-
-  .card-head {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    margin-bottom: 1.25rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 1.5px solid var(--border);
-    gap: 1rem;
-  }
-
-  .card-head h2 {
-    font-family: var(--serif);
-    font-size: 1rem;
-    font-weight: 700;
-    text-decoration: underline;
-    text-underline-offset: 4px;
-    text-decoration-thickness: 1.5px;
-    white-space: nowrap;
-  }
-
-  .tag {
-    font-family: var(--mono);
-    font-size: 0.6rem;
-    background: var(--ink);
-    color: var(--bg);
-    padding: 3px 7px;
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
-
-  /* ─── SECTION LABEL ─── */
-  .sec {
-    font-family: var(--mono);
-    font-size: 0.6rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--muted);
-    padding: 1rem 0 0.4rem;
-    border-bottom: 0.5px solid rgba(26,26,24,0.15);
-    margin-bottom: 0.1rem;
-  }
-
-  .sec:first-of-type { padding-top: 0; }
-
-  /* ─── FIELD ROW ─── */
-  .field-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    padding: 0.55rem 0;
-    border-bottom: 0.5px solid rgba(26,26,24,0.1);
-  }
-
-  .field-row:last-child { border-bottom: none; }
-
-  .field-row label {
-    font-family: var(--mono);
-    font-size: 0.7rem;
-    color: var(--muted);
-    line-height: 1.35;
-    flex: 1;
-  }
-
-  .field-right {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex-shrink: 0;
-  }
-
-  .field-right input {
-    width: 90px;
-    border: 1px solid rgba(26,26,24,0.3);
-    background: var(--white);
-    font-family: var(--mono);
-    font-size: 0.78rem;
-    padding: 5px 10px;
-    text-align: right;
-    color: var(--ink);
-    -moz-appearance: textfield;
-    transition: border-color .12s, outline .12s;
-  }
-
-  .field-right input:focus {
-    outline: 2px solid var(--ink);
-    outline-offset: 1px;
-    border-color: var(--ink);
-  }
-
-  .field-right input::-webkit-outer-spin-button,
-  .field-right input::-webkit-inner-spin-button { -webkit-appearance: none; }
-
-  .field-right .unit {
-    font-family: var(--mono);
-    font-size: 0.65rem;
-    color: var(--muted);
-    min-width: 24px;
-  }
-
-  /* ─── PESSOA ROW ─── */
-  .pessoa-col-heads {
-    display: grid;
-    grid-template-columns: 1fr 95px 16px 80px;
-    gap: 6px;
-    margin-bottom: 0.35rem;
-  }
-
-  .pessoa-col-heads span {
-    font-family: var(--mono);
-    font-size: 0.6rem;
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
-    color: var(--muted);
-    text-align: right;
-  }
-
-  .pessoa-col-heads span:first-child { text-align: left; }
-
-  .pessoa-row {
-    display: grid;
-    grid-template-columns: 1fr 95px 16px 80px;
-    align-items: center;
-    gap: 6px;
-    padding: 0.5rem 0;
-    border-bottom: 0.5px solid rgba(26,26,24,0.1);
-  }
-
-  .pessoa-row:last-of-type { border-bottom: none; }
-
-  .pessoa-row label {
-    font-family: var(--mono);
-    font-size: 0.7rem;
-    color: var(--muted);
-  }
-
-  .pessoa-row input {
-    width: 100%;
-    border: 1px solid rgba(26,26,24,0.3);
-    background: var(--white);
-    font-family: var(--mono);
-    font-size: 0.75rem;
-    padding: 5px 8px;
-    text-align: right;
-    color: var(--ink);
-    -moz-appearance: textfield;
-  }
-
-  .pessoa-row input:focus {
-    outline: 2px solid var(--ink);
-    outline-offset: 1px;
-  }
-
-  .pessoa-row input::-webkit-outer-spin-button,
-  .pessoa-row input::-webkit-inner-spin-button { -webkit-appearance: none; }
-
-  .pessoa-row .sep {
-    font-family: var(--mono);
-    font-size: 0.65rem;
-    color: var(--muted);
-    text-align: center;
-  }
-
-  /* ─── SUBTOTAL ─── */
-  .subtotal {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    padding: 0.9rem 0 0;
-    margin-top: 0.5rem;
-    border-top: 1.5px solid var(--border);
-  }
-
-  .subtotal span {
-    font-family: var(--mono);
-    font-size: 0.7rem;
-    font-weight: 500;
-  }
-
-  .subtotal .val {
-    font-family: var(--serif);
-    font-size: 1.2rem;
-    font-weight: 700;
-  }
-
-  /* ─── MARKUP GRID ─── */
-  .markup-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    column-gap: 2rem;
-  }
-
-  /* ─── NOTA ─── */
-  .nota {
-    background: var(--yellow-bg);
-    border-left: 3px solid var(--yellow-accent);
-    padding: 0.85rem 1.1rem;
-    margin-top: 1.25rem;
-    font-family: var(--mono);
-    font-size: 0.67rem;
-    line-height: 1.65;
-    color: var(--ink);
-  }
-
-  .nota strong {
-    display: block;
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
-    font-size: 0.62rem;
-    margin-bottom: 0.25rem;
-    color: var(--yellow-accent);
-  }
-
-  /* ─── RESUMO VALUES ─── */
-  .res-val {
-    font-family: var(--mono);
-    font-size: 0.85rem;
-    font-weight: 500;
-    text-align: right;
-  }
-
-  .res-val-lg {
-    font-family: var(--serif);
-    font-size: 1.35rem;
-    font-weight: 900;
-    text-align: right;
-    text-decoration: underline;
-    text-underline-offset: 4px;
-  }
-
-  .res-val-muted {
-    font-family: var(--mono);
-    font-size: 0.75rem;
-    color: var(--muted);
-    text-align: right;
-  }
-
-  .markup-display {
-    font-family: var(--serif);
-    font-size: 1.1rem;
-    font-weight: 700;
-    text-align: right;
-  }
-
-  /* ─── BARRA DE RESULTADO ─── */
-  .resultado {
-    background: var(--ink);
-    color: var(--bg);
-    padding: 1.75rem 3rem;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 99;
-    border-top: 2px solid rgba(255,255,255,0.1);
-  }
-
-  .res-bar-grid {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 1rem;
-    max-width: 1200px;
-    align-items: end;
-  }
-
-  .res-bar-item label {
-    font-family: var(--mono);
-    font-size: 0.58rem;
-    text-transform: uppercase;
-    letter-spacing: 0.09em;
-    opacity: 0.4;
-    display: block;
-    margin-bottom: 0.35rem;
-  }
-
-  .res-bar-item .big {
-    font-family: var(--serif);
-    font-weight: 900;
-    font-size: 1.2rem;
-    line-height: 1;
-    text-decoration: underline;
-    text-underline-offset: 4px;
-  }
-
-  .res-bar-item .big.destaque { font-size: 1.7rem; }
-  .res-bar-item .big.pos { color: #7de8a0; }
-  .res-bar-item .big.neg { color: #f08080; }
-
-  .markup-pill {
-    display: inline-block;
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.18);
-    padding: 0.35rem 0.85rem;
-  }
-
-  .markup-pill span {
-    font-family: var(--serif);
-    font-size: 1.35rem;
-    font-weight: 700;
-  }
-
-  /* ─── RESPONSIVE ─── */
-  @media (max-width: 1024px) {
-    .setup-grid { grid-template-columns: 1fr 1fr; }
-    .calc-grid { grid-template-columns: 1fr 1fr; }
-    .res-bar-grid { grid-template-columns: repeat(3,1fr); }
-    .panel { padding: 2rem 2rem 7rem; }
-    .tab-bar { padding: 0 2rem; }
-  }
-
-  @media (max-width: 700px) {
-    .setup-grid { grid-template-columns: 1fr; }
-    .calc-grid { grid-template-columns: 1fr; }
-    .markup-grid { grid-template-columns: 1fr 1fr; }
-    .res-bar-grid { grid-template-columns: repeat(2,1fr); }
-    .panel { padding: 1.5rem 1.25rem 8rem; }
-    .tab-bar { padding: 0 1.25rem; }
-    .tab-bar h1 { font-size: 0.95rem; }
-    .resultado { padding: 1.25rem 1.5rem; }
-  }
-
-  /* ─── ABA COMO FUNCIONA ─── */
-  .guia-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem;
-    max-width: 1200px;
-    margin-bottom: 1.5rem;
-  }
-
-  .guia-block {
-    border: 1.5px solid var(--border);
-    overflow: hidden;
-  }
-
-  .guia-head {
-    padding: 1rem 1.25rem 0.75rem;
-    border-bottom: 1.5px solid var(--border);
-  }
-
-  .guia-head h3 {
-    font-family: var(--serif);
-    font-size: 0.95rem;
-    font-weight: 700;
-    margin-bottom: 0.2rem;
-  }
-
-  .guia-head p {
-    font-family: var(--mono);
-    font-size: 0.6rem;
-    opacity: 0.6;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-  }
-
-  .guia-formula {
-    padding: 0.65rem 1.25rem;
-    border-bottom: 1px solid rgba(0,0,0,0.1);
-  }
-
-  .guia-formula code {
-    font-family: var(--mono);
-    font-size: 0.75rem;
-    font-weight: 500;
-    letter-spacing: -0.01em;
-  }
-
-  .guia-lines {
-    padding: 0.5rem 0;
-  }
-
-  .guia-line {
-    display: grid;
-    grid-template-columns: 2.5rem 1fr;
-    gap: 0;
-    padding: 0.45rem 1.25rem 0.45rem 0;
-    border-bottom: 0.5px solid rgba(0,0,0,0.07);
-    align-items: start;
-  }
-
-  .guia-line:last-child { border-bottom: none; }
-
-  .guia-bullet {
-    font-family: var(--mono);
-    font-size: 0.65rem;
-    font-weight: 600;
-    padding-left: 1.25rem;
-    padding-top: 0.1rem;
-    flex-shrink: 0;
-  }
-
-  .guia-text {
-    font-family: var(--sans);
-    font-size: 0.78rem;
-    line-height: 1.55;
-    color: var(--ink);
-  }
-
-  .guia-alert {
-    margin: 0.75rem 1.25rem 1rem;
-    padding: 0.65rem 0.9rem;
-    font-family: var(--mono);
-    font-size: 0.67rem;
-    line-height: 1.6;
-    border-left: 3px solid;
-  }
-
-  .guia-alert strong {
-    display: block;
-    font-size: 0.6rem;
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
-    margin-bottom: 0.2rem;
-  }
-
-  .guia-example {
-    margin: 0 1.25rem 1.25rem;
-    border: 1px solid rgba(0,0,0,0.12);
-    overflow: hidden;
-  }
-
-  .guia-example-head {
-    padding: 0.35rem 0.75rem;
-    font-family: var(--mono);
-    font-size: 0.6rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    font-weight: 600;
-  }
-
-  .guia-example-row {
-    display: flex;
-    justify-content: space-between;
-    padding: 0.32rem 0.75rem;
-    border-top: 0.5px solid rgba(0,0,0,0.08);
-    font-family: var(--mono);
-    font-size: 0.72rem;
-  }
-
-  .guia-example-row.total {
-    border-top-width: 1.5px;
-    font-weight: 700;
-  }
-
-  .guia-example-row span:last-child { text-align: right; }
-
-  /* FLUXO */
-  .fluxo-wrap {
-    max-width: 1200px;
-    margin-bottom: 2rem;
-  }
-
-  .fluxo-head {
-    background: var(--ink);
-    color: var(--bg);
-    padding: 0.75rem 1.5rem;
-    font-family: var(--mono);
-    font-size: 0.65rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin-bottom: 0;
-    border: 1.5px solid var(--border);
-    border-bottom: none;
-  }
-
-  .fluxo-steps {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    border: 1.5px solid var(--border);
-  }
-
-  .fluxo-step {
-    padding: 1rem 1rem 1.1rem;
-    border-right: 1px solid rgba(0,0,0,0.15);
-    position: relative;
-  }
-
-  .fluxo-step:last-child { border-right: none; }
-
-  .fluxo-num {
-    font-family: var(--serif);
-    font-size: 1.5rem;
-    font-weight: 900;
-    line-height: 1;
-    margin-bottom: 0.4rem;
-    display: block;
-  }
-
-  .fluxo-title {
-    font-family: var(--sans);
-    font-size: 0.78rem;
-    font-weight: 600;
-    margin-bottom: 0.3rem;
-    line-height: 1.2;
-  }
-
-  .fluxo-sub {
-    font-family: var(--mono);
-    font-size: 0.62rem;
-    color: var(--muted);
-    line-height: 1.45;
-  }
-
-  .fluxo-arrow {
-    position: absolute;
-    right: -10px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 1rem;
-    color: var(--muted);
-    z-index: 1;
-  }
-
-  .fluxo-step:last-child .fluxo-arrow { display: none; }
-
-  @media (max-width: 1024px) {
-    .guia-grid { grid-template-columns: 1fr 1fr; }
-    .fluxo-steps { grid-template-columns: repeat(4, 1fr); }
-  }
-
-  @media (max-width: 700px) {
-    .guia-grid { grid-template-columns: 1fr; }
-    .fluxo-steps { grid-template-columns: repeat(2, 1fr); }
-  }
-</style>
-</head>
-<body>
-
-<!-- TAB BAR -->
-<div class="tab-bar">
-  <h1>A Incrível Máquina de Orçamentos</h1>
-  <div class="tab active" onclick="switchTab('setup')">Setup do Estúdio</div>
-  <div class="tab" onclick="switchTab('calc')">Orçamento</div>
-  <div class="tab" onclick="switchTab('guia')">Como Funciona</div>
-  <div class="tab-byline">Sobreviver de Design &nbsp;·&nbsp; miligrama. &nbsp;·&nbsp; 2026</div>
-</div>
-
-<!-- ═══ ABA SETUP ═══ -->
-<div class="panel active" id="panel-setup">
-  <div class="setup-grid">
-
-    <!-- EQUIPE -->
-    <div class="card">
-      <div class="card-head">
-        <h2>Equipe</h2>
-        <span class="tag">salário + horas/mês</span>
-      </div>
-      <div class="pessoa-col-heads">
-        <span>pessoa</span>
-        <span>salário R$</span>
-        <span></span>
-        <span>horas/mês</span>
-      </div>
-      <div class="pessoa-row">
-        <label>Pessoa 1</label>
-        <input type="number" id="sal1" value="5000" min="0" step="100">
-        <span class="sep">/</span>
-        <input type="number" id="h1" value="160" min="0" step="8">
-      </div>
-      <div class="pessoa-row">
-        <label>Pessoa 2</label>
-        <input type="number" id="sal2" value="4500" min="0" step="100">
-        <span class="sep">/</span>
-        <input type="number" id="h2" value="160" min="0" step="8">
-      </div>
-      <div class="pessoa-row">
-        <label>Pessoa 3</label>
-        <input type="number" id="sal3" value="3500" min="0" step="100">
-        <span class="sep">/</span>
-        <input type="number" id="h3" value="140" min="0" step="4">
-      </div>
-      <div class="subtotal">
-        <span>Custo/hora médio da equipe</span>
-        <span class="val" id="custo_hora_display">R$ —</span>
-      </div>
-    </div>
-
-    <!-- CUSTOS FIXOS -->
-    <div class="card">
-      <div class="card-head">
-        <h2>Custos Fixos</h2>
-        <span class="tag">mensais</span>
-      </div>
-      <div class="sec">estrutura</div>
-      <div class="field-row"><label>Internet + telefone</label><div class="field-right"><input type="number" id="cf_internet" value="250" min="0"><span class="unit">R$</span></div></div>
-      <div class="field-row"><label>Coworking (esporádico)</label><div class="field-right"><input type="number" id="cf_coworking" value="300" min="0"><span class="unit">R$</span></div></div>
-      <div class="field-row"><label>Contador</label><div class="field-right"><input type="number" id="cf_contador" value="350" min="0"><span class="unit">R$</span></div></div>
-      <div class="field-row"><label>Depreciação de equipamentos</label><div class="field-right"><input type="number" id="cf_depreciacao" value="200" min="0"><span class="unit">R$</span></div></div>
-      <div class="sec">assinaturas / software</div>
-      <div class="field-row"><label>Adobe CC</label><div class="field-right"><input type="number" id="cf_adobe" value="350" min="0"><span class="unit">R$</span></div></div>
-      <div class="field-row"><label>Figma</label><div class="field-right"><input type="number" id="cf_figma" value="120" min="0"><span class="unit">R$</span></div></div>
-      <div class="field-row"><label>ChatGPT / Claude Pro</label><div class="field-right"><input type="number" id="cf_ai" value="120" min="0"><span class="unit">R$</span></div></div>
-      <div class="field-row"><label>Midjourney / IA generativa</label><div class="field-right"><input type="number" id="cf_midjourney" value="60" min="0"><span class="unit">R$</span></div></div>
-      <div class="field-row"><label>Fontes (licenças)</label><div class="field-right"><input type="number" id="cf_fontes" value="80" min="0"><span class="unit">R$</span></div></div>
-      <div class="field-row"><label>Hospedagem + domínio</label><div class="field-right"><input type="number" id="cf_hosting" value="80" min="0"><span class="unit">R$</span></div></div>
-      <div class="field-row"><label>Armazenamento (Drive / Dropbox)</label><div class="field-right"><input type="number" id="cf_storage" value="50" min="0"><span class="unit">R$</span></div></div>
-      <div class="field-row"><label>Outros (cursos, materiais)</label><div class="field-right"><input type="number" id="cf_outros" value="200" min="0"><span class="unit">R$</span></div></div>
-      <div class="subtotal">
-        <span>Total fixos/mês</span>
-        <span class="val" id="total_fixo_display">R$ —</span>
-      </div>
-    </div>
-
-    <!-- MARKUP + CÂMBIO -->
-    <div class="setup-col-right">
-
-      <div class="card">
-        <div class="card-head">
-          <h2>Markup e Proteção</h2>
-          <span class="tag">%</span>
-        </div>
-        <div class="markup-grid">
-          <div>
-            <div class="field-row"><label>% vai dar merda</label><div class="field-right"><input type="number" id="p_merda" value="10" min="0" max="99"><span class="unit">%</span></div></div>
-            <div class="field-row"><label>% impostos</label><div class="field-right"><input type="number" id="p_imposto" value="6" min="0" max="99"><span class="unit">%</span></div></div>
-          </div>
-          <div>
-            <div class="field-row"><label>% comissão</label><div class="field-right"><input type="number" id="p_comissao" value="0" min="0" max="99"><span class="unit">%</span></div></div>
-            <div class="field-row"><label>% negociação</label><div class="field-right"><input type="number" id="p_negociacao" value="10" min="0" max="99"><span class="unit">%</span></div></div>
-          </div>
-          <div>
-            <div class="field-row"><label>% investimento</label><div class="field-right"><input type="number" id="p_investimento" value="5" min="0" max="99"><span class="unit">%</span></div></div>
-            <div class="field-row"><label>% lucro</label><div class="field-right"><input type="number" id="p_lucro" value="20" min="0" max="99"><span class="unit">%</span></div></div>
-          </div>
-        </div>
-        <div class="nota">
-          <strong>% vai dar merda</strong>
-          Reserva para mudança de briefing na metade do projeto, subestimativa de horas, fornecedor que atrasa, cliente que some e volta. Nunca zere esse campo.
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-head">
-          <h2>Câmbio</h2>
-          <span class="tag">projetos internacionais</span>
-        </div>
-        <div class="field-row"><label>USD → BRL</label><div class="field-right"><input type="number" id="cambio_usd" value="5.80" min="0" step="0.05"><span class="unit">R$</span></div></div>
-        <div class="field-row"><label>EUR → BRL</label><div class="field-right"><input type="number" id="cambio_eur" value="6.20" min="0" step="0.05"><span class="unit">R$</span></div></div>
-      </div>
-
-    </div>
-  </div>
-</div>
-
-<!-- ═══ ABA ORÇAMENTO ═══ -->
-<div class="panel" id="panel-calc">
-  <div class="calc-grid">
-
-    <!-- HORAS DO JOB -->
-    <div class="card">
-      <div class="card-head">
-        <h2>Horas do Job</h2>
-        <span class="tag">por etapa</span>
-      </div>
-      <div class="sec">etapas do processo</div>
-      <div class="field-row"><label>A — Negociação / briefing</label><div class="field-right"><input type="number" id="h_neg" value="4" min="0"><span class="unit">h</span></div></div>
-      <div class="field-row"><label>B — Pesquisa e análise</label><div class="field-right"><input type="number" id="h_pes" value="16" min="0"><span class="unit">h</span></div></div>
-      <div class="field-row"><label>C — Conceituação / estratégia</label><div class="field-right"><input type="number" id="h_con" value="8" min="0"><span class="unit">h</span></div></div>
-      <div class="field-row"><label>D — Criação</label><div class="field-right"><input type="number" id="h_cri" value="24" min="0"><span class="unit">h</span></div></div>
-      <div class="field-row"><label>E — Revisões e ajustes</label><div class="field-right"><input type="number" id="h_rev" value="8" min="0"><span class="unit">h</span></div></div>
-      <div class="field-row"><label>F — Implementação / entrega</label><div class="field-right"><input type="number" id="h_ent" value="4" min="0"><span class="unit">h</span></div></div>
-      <div class="field-row"><label>Gestão / reuniões extras</label><div class="field-right"><input type="number" id="h_ges" value="4" min="0"><span class="unit">h</span></div></div>
-      <div class="subtotal">
-        <span>Total horas</span>
-        <span class="val" id="total_horas_display">— h</span>
-      </div>
-    </div>
-
-    <!-- CUSTOS VARIÁVEIS -->
-    <div class="card">
-      <div class="card-head">
-        <h2>Custos Variáveis</h2>
-        <span class="tag">por job</span>
-      </div>
-      <div class="sec">só paga se fechar o job</div>
-      <div class="field-row"><label>Banco de imagens</label><div class="field-right"><input type="number" id="cv_img" value="0" min="0"><span class="unit">R$</span></div></div>
-      <div class="field-row"><label>Fontes específicas do projeto</label><div class="field-right"><input type="number" id="cv_fon" value="0" min="0"><span class="unit">R$</span></div></div>
-      <div class="field-row"><label>Terceirizados (fotógrafo, dev…)</label><div class="field-right"><input type="number" id="cv_ter" value="0" min="0"><span class="unit">R$</span></div></div>
-      <div class="field-row"><label>Impressão / prototipagem</label><div class="field-right"><input type="number" id="cv_imp" value="0" min="0"><span class="unit">R$</span></div></div>
-      <div class="field-row"><label>Frete / correio</label><div class="field-right"><input type="number" id="cv_fre" value="0" min="0"><span class="unit">R$</span></div></div>
-      <div class="field-row"><label>Outros variáveis</label><div class="field-right"><input type="number" id="cv_out" value="0" min="0"><span class="unit">R$</span></div></div>
-      <div class="subtotal">
-        <span>Total variáveis</span>
-        <span class="val" id="total_var_display">R$ 0</span>
-      </div>
-      <div class="nota">
-        <strong>custo do tempo</strong>
-        <span id="nota_custo_tempo">Preencha as horas para ver o custo do tempo.</span>
-      </div>
-    </div>
-
-    <!-- RESUMO DO JOB -->
-    <div class="card">
-      <div class="card-head">
-        <h2>Resumo do Job</h2>
-        <span class="tag">composição do preço</span>
-      </div>
-
-      <div class="sec">composição de custo</div>
-      <div class="field-row">
-        <label>Custo do tempo<br><span style="opacity:0.6;font-size:0.62rem">(horas × custo/hora da equipe)</span></label>
-        <span class="res-val" id="r_tempo">R$ —</span>
-      </div>
-      <div class="field-row">
-        <label>Custos variáveis do job</label>
-        <span class="res-val" id="r_var">R$ —</span>
-      </div>
-      <div class="field-row" style="padding: 0.7rem 0; border-bottom: 1.5px solid var(--border);">
-        <label style="font-weight:500; color: var(--ink);">Custo operacional total</label>
-        <span class="res-val" style="font-size:0.95rem" id="r_op">R$ —</span>
-      </div>
-
-      <div class="sec">markup</div>
-      <div class="field-row">
-        <label>Taxa markup aplicada</label>
-        <span class="markup-display" id="r_markup">—×</span>
-      </div>
-      <div class="field-row">
-        <label>Percentuais ativos</label>
-        <span class="res-val-muted" id="r_pcts" style="font-size:0.68rem">—</span>
-      </div>
-
-      <div class="sec">resultado</div>
-      <div class="field-row" style="padding: 0.9rem 0;">
-        <label style="font-weight:500; color: var(--ink); font-size:0.72rem">Preço final (BRL)</label>
-        <span class="res-val-lg" id="r_final">R$ —</span>
-      </div>
-      <div class="field-row">
-        <label>Equivalente em USD</label>
-        <span class="res-val-muted" id="r_usd">$ —</span>
-      </div>
-      <div class="field-row">
-        <label>Equivalente em EUR</label>
-        <span class="res-val-muted" id="r_eur">€ —</span>
-      </div>
-      <div class="field-row" style="padding-bottom: 0; border-bottom: none; margin-top: 0.25rem;">
-        <label style="color: var(--ink);">Lucro real do estúdio</label>
-        <span style="font-family:var(--serif);font-size:1.2rem;font-weight:700;color:var(--green)" id="r_lucro">R$ —</span>
-      </div>
-
-    </div>
-
-  </div>
-</div>
-
-<!-- ═══ BARRA RESULTADO FIXA ═══ -->
-<div class="resultado">
-  <div class="res-bar-grid">
-    <div class="res-bar-item">
-      <label>Custo / hora</label>
-      <div class="big" id="b_chora">R$ —</div>
-    </div>
-    <div class="res-bar-item">
-      <label>Horas totais</label>
-      <div class="big" id="b_horas">— h</div>
-    </div>
-    <div class="res-bar-item">
-      <label>Custo operacional</label>
-      <div class="big" id="b_cop">R$ —</div>
-    </div>
-    <div class="res-bar-item">
-      <label>Markup</label>
-      <div class="markup-pill"><span id="b_markup">—×</span></div>
-    </div>
-    <div class="res-bar-item">
-      <label>Lucro real</label>
-      <div class="big pos" id="b_lucro">R$ —</div>
-    </div>
-    <div class="res-bar-item" style="text-align:right">
-      <label>Preço final</label>
-      <div class="big destaque" id="b_final">R$ —</div>
-    </div>
-  </div>
-</div>
-
-
-<!-- ═══ ABA COMO FUNCIONA ═══ -->
-<div class="panel" id="panel-guia">
-
-  <div class="fluxo-wrap">
-    <div class="fluxo-head">Fluxo completo — do briefing ao preço final</div>
-    <div class="fluxo-steps">
-      <div class="fluxo-step" style="background:var(--green-bg)">
-        <span class="fluxo-num" style="color:var(--green-acc)">1</span>
-        <div class="fluxo-title">Setup do Estúdio</div>
-        <div class="fluxo-sub">Salários, custos fixos, markup, câmbio. Configura uma vez.</div>
-        <span class="fluxo-arrow">›</span>
-      </div>
-      <div class="fluxo-step" style="background:var(--yellow-bg)">
-        <span class="fluxo-num" style="color:var(--yellow-accent)">2</span>
-        <div class="fluxo-title">Custo / Hora</div>
-        <div class="fluxo-sub">(Salários + Fixos) ÷ total de horas/mês da equipe</div>
-        <span class="fluxo-arrow">›</span>
-      </div>
-      <div class="fluxo-step" style="background:var(--blue-bg)">
-        <span class="fluxo-num" style="color:var(--blue-acc)">3</span>
-        <div class="fluxo-title">Horas do Job</div>
-        <div class="fluxo-sub">Some todas as etapas A→F mais gestão e reuniões.</div>
-        <span class="fluxo-arrow">›</span>
-      </div>
-      <div class="fluxo-step" style="background:var(--purple-bg)">
-        <span class="fluxo-num" style="color:var(--purple-acc)">4</span>
-        <div class="fluxo-title">Custo do Tempo</div>
-        <div class="fluxo-sub">Horas do job × custo/hora da equipe</div>
-        <span class="fluxo-arrow">›</span>
-      </div>
-      <div class="fluxo-step" style="background:var(--red-bg)">
-        <span class="fluxo-num" style="color:var(--red-acc)">5</span>
-        <div class="fluxo-title">Custos Variáveis</div>
-        <div class="fluxo-sub">Só paga se fechar o job: imagens, fontes, terceiros.</div>
-        <span class="fluxo-arrow">›</span>
-      </div>
-      <div class="fluxo-step" style="background:var(--surface)">
-        <span class="fluxo-num" style="color:var(--muted)">6</span>
-        <div class="fluxo-title">Custo Operacional</div>
-        <div class="fluxo-sub">Tempo + variáveis. É a base de cálculo do markup.</div>
-        <span class="fluxo-arrow">›</span>
-      </div>
-      <div class="fluxo-step" style="background:var(--ink)">
-        <span class="fluxo-num" style="color:#fff">7</span>
-        <div class="fluxo-title" style="color:#fff">Preço Final</div>
-        <div class="fluxo-sub" style="color:rgba(255,255,255,0.5)">Custo op. × taxa markup → valor que vai ao cliente.</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="guia-grid">
-
-    <div class="guia-block" style="background:var(--green-bg)">
-      <div class="guia-head" style="border-color:var(--green-acc)">
-        <h3 style="color:var(--green-acc)">1. Custo / Hora da Equipe</h3>
-        <p style="color:var(--green-acc)">como calculamos o valor de cada hora trabalhada</p>
-      </div>
-      <div class="guia-formula" style="background:rgba(30,92,53,0.08); border-color:rgba(30,92,53,0.2)">
-        <code style="color:var(--green-acc)">(Salários + Custos Fixos) ÷ Total de Horas/Mês</code>
-      </div>
-      <div class="guia-lines">
-        <div class="guia-line"><span class="guia-bullet" style="color:var(--green-acc)">→</span><span class="guia-text">Some todos os salários mensais de cada pessoa do estúdio.</span></div>
-        <div class="guia-line"><span class="guia-bullet" style="color:var(--green-acc)">→</span><span class="guia-text">Some todos os custos fixos: internet, contador, Adobe, Figma, ChatGPT, fontes e por aí vai.</span></div>
-        <div class="guia-line"><span class="guia-bullet" style="color:var(--green-acc)">→</span><span class="guia-text">Divida o total pelo somatório de horas produtivas mensais de toda a equipe.</span></div>
-        <div class="guia-line"><span class="guia-bullet" style="color:var(--green-acc)">→</span><span class="guia-text">Cada pessoa pode ter horas disponíveis diferentes. Já está contemplado na planilha.</span></div>
-        <div class="guia-line"><span class="guia-bullet" style="color:var(--green-acc)">!</span><span class="guia-text">Esse valor é o custo real de existir — antes de qualquer lucro. É o chão do seu orçamento.</span></div>
-      </div>
-      <div class="guia-example" style="border-color:rgba(30,92,53,0.2)">
-        <div class="guia-example-head" style="background:rgba(30,92,53,0.1); color:var(--green-acc)">Exemplo numérico</div>
-        <div class="guia-example-row"><span>Salário total (3 pessoas)</span><span>R$ 13.000</span></div>
-        <div class="guia-example-row"><span>Custos fixos mensais</span><span>R$ 1.810</span></div>
-        <div class="guia-example-row"><span>Total mensal</span><span>R$ 14.810</span></div>
-        <div class="guia-example-row"><span>Total de horas/mês</span><span>460 h</span></div>
-        <div class="guia-example-row total" style="border-color:var(--green-acc); color:var(--green-acc)"><span>→ Custo/hora</span><span>R$ 32,19/h</span></div>
-      </div>
-      <div class="guia-alert" style="background:rgba(30,92,53,0.06); border-color:var(--green-acc); color:var(--green-acc)">
-        <strong>lembre-se</strong>
-        Seu salário entra nos custos fixos — não no lucro. Se você não se pagar, está trabalhando de graça sem perceber.
-      </div>
-    </div>
-
-    <div class="guia-block" style="background:var(--yellow-bg)">
-      <div class="guia-head" style="border-color:var(--yellow-accent)">
-        <h3 style="color:var(--yellow-accent)">2. Markup e Proteção</h3>
-        <p style="color:var(--yellow-accent)">por que o preço final é maior que o custo operacional</p>
-      </div>
-      <div class="guia-formula" style="background:rgba(184,134,11,0.08); border-color:rgba(184,134,11,0.2)">
-        <code style="color:var(--yellow-accent)">Preço = Custo ÷ (1 − soma dos percentuais)</code>
-      </div>
-      <div class="guia-lines">
-        <div class="guia-line"><span class="guia-bullet" style="color:var(--yellow-accent)">→</span><span class="guia-text"><strong>% vai dar merda:</strong> imprevistos, mudança de briefing, hora subestimada. Nunca zere.</span></div>
-        <div class="guia-line"><span class="guia-bullet" style="color:var(--yellow-accent)">→</span><span class="guia-text"><strong>% impostos:</strong> MEI recolhe ~6% sobre faturamento. ME pode chegar a 15,5%.</span></div>
-        <div class="guia-line"><span class="guia-bullet" style="color:var(--yellow-accent)">→</span><span class="guia-text"><strong>% negociação:</strong> margem para dar desconto sem entrar no seu lucro.</span></div>
-        <div class="guia-line"><span class="guia-bullet" style="color:var(--yellow-accent)">→</span><span class="guia-text"><strong>% comissão:</strong> parceiro comercial, agência, indicação. Só preencha se houver.</span></div>
-        <div class="guia-line"><span class="guia-bullet" style="color:var(--yellow-accent)">→</span><span class="guia-text"><strong>% investimento:</strong> reserva para equipamentos, cursos ou emergências futuras.</span></div>
-        <div class="guia-line"><span class="guia-bullet" style="color:var(--yellow-accent)">→</span><span class="guia-text"><strong>% lucro:</strong> o que sobra para o estúdio crescer. Diferente do seu salário — esse já está nos fixos.</span></div>
-        <div class="guia-line"><span class="guia-bullet" style="color:var(--yellow-accent)">!</span><span class="guia-text">A fórmula correta é 1÷(1−soma). Multiplicar o custo pelo percentual dá resultado sempre menor do que o necessário.</span></div>
-      </div>
-      <div class="guia-example" style="border-color:rgba(184,134,11,0.25)">
-        <div class="guia-example-head" style="background:rgba(184,134,11,0.1); color:var(--yellow-accent)">Exemplo — percentuais padrão</div>
-        <div class="guia-example-row"><span>% vai dar merda</span><span>10%</span></div>
-        <div class="guia-example-row"><span>% impostos</span><span>6%</span></div>
-        <div class="guia-example-row"><span>% negociação</span><span>10%</span></div>
-        <div class="guia-example-row"><span>% investimento</span><span>5%</span></div>
-        <div class="guia-example-row"><span>% lucro</span><span>20%</span></div>
-        <div class="guia-example-row" style="color:var(--muted)"><span>Soma total</span><span>51%</span></div>
-        <div class="guia-example-row total" style="border-color:var(--yellow-accent); color:var(--yellow-accent)"><span>→ Taxa markup</span><span>2,04×</span></div>
-      </div>
-    </div>
-
-    <div class="guia-block" style="background:var(--blue-bg)">
-      <div class="guia-head" style="border-color:var(--blue-acc)">
-        <h3 style="color:var(--blue-acc)">3. Composição do Preço Final</h3>
-        <p style="color:var(--blue-acc)">o que entra no preço que você envia ao cliente</p>
-      </div>
-      <div class="guia-formula" style="background:rgba(26,58,122,0.07); border-color:rgba(26,58,122,0.2)">
-        <code style="color:var(--blue-acc)">Custo Tempo + Variáveis = Base → × Markup</code>
-      </div>
-      <div class="guia-lines">
-        <div class="guia-line"><span class="guia-bullet" style="color:var(--blue-acc)">→</span><span class="guia-text"><strong>Custo do Tempo:</strong> horas do job × custo/hora da equipe. É o coração do orçamento.</span></div>
-        <div class="guia-line"><span class="guia-bullet" style="color:var(--blue-acc)">→</span><span class="guia-text"><strong>Custos Variáveis:</strong> só paga se fechar o job — banco de imagens, fontes, terceiros, impressão.</span></div>
-        <div class="guia-line"><span class="guia-bullet" style="color:var(--blue-acc)">→</span><span class="guia-text"><strong>Custo Operacional:</strong> soma do custo do tempo com os variáveis. É a base para o markup.</span></div>
-        <div class="guia-line"><span class="guia-bullet" style="color:var(--blue-acc)">→</span><span class="guia-text"><strong>Preço Final:</strong> custo operacional multiplicado pela taxa markup. Valor que vai para o cliente.</span></div>
-        <div class="guia-line"><span class="guia-bullet" style="color:var(--blue-acc)">→</span><span class="guia-text"><strong>Lucro Real:</strong> preço final menos o custo operacional. O que entra no caixa além dos custos.</span></div>
-        <div class="guia-line"><span class="guia-bullet" style="color:var(--blue-acc)">!</span><span class="guia-text">Inclua as horas de negociação e briefing. Você já está trabalhando antes de assinar o contrato.</span></div>
-      </div>
-      <div class="guia-example" style="border-color:rgba(26,58,122,0.2)">
-        <div class="guia-example-head" style="background:rgba(26,58,122,0.08); color:var(--blue-acc)">Exemplo — 68h a R$ 32,19/h</div>
-        <div class="guia-example-row"><span>Custo do tempo (68 × R$ 32,19)</span><span>R$ 2.189</span></div>
-        <div class="guia-example-row"><span>Custos variáveis</span><span>R$ 150</span></div>
-        <div class="guia-example-row" style="color:var(--muted)"><span>Custo operacional</span><span>R$ 2.339</span></div>
-        <div class="guia-example-row"><span>Taxa markup (×2,04)</span><span>—</span></div>
-        <div class="guia-example-row total" style="border-color:var(--blue-acc); color:var(--blue-acc)"><span>→ Preço Final</span><span>R$ 4.771</span></div>
-        <div class="guia-example-row" style="color:var(--green-acc)"><span>Lucro real</span><span>R$ 2.432</span></div>
-      </div>
-    </div>
-
-  </div>
-
-  <div class="guia-grid">
-
-    <div class="guia-block" style="background:var(--purple-bg)">
-      <div class="guia-head" style="border-color:var(--purple-acc)">
-        <h3 style="color:var(--purple-acc)">4. Custos Fixos × Variáveis</h3>
-        <p style="color:var(--purple-acc)">a diferença que muda tudo na hora de orçar</p>
-      </div>
-      <div class="guia-lines">
-        <div class="guia-line"><span class="guia-bullet" style="color:var(--purple-acc)">FIXO</span><span class="guia-text">Você paga todo mês, tenha job ou não. Salário, internet, Adobe, contador. São os custos de existir.</span></div>
-        <div class="guia-line"><span class="guia-bullet" style="color:var(--purple-acc)">FIXO</span><span class="guia-text">Quanto mais jobs você fechar, menor é o impacto de cada custo fixo por projeto.</span></div>
-        <div class="guia-line"><span class="guia-bullet" style="color:var(--purple-acc)">VAR.</span><span class="guia-text">Você só paga se fechar o job. Banco de imagens, fontes do projeto, fotógrafo terceirizado.</span></div>
-        <div class="guia-line"><span class="guia-bullet" style="color:var(--purple-acc)">VAR.</span><span class="guia-text">Nunca inclua custos variáveis no custo/hora — eles entram separados em cada orçamento.</span></div>
-        <div class="guia-line"><span class="guia-bullet" style="color:var(--purple-acc)">!</span><span class="guia-text">Erro clássico: misturar fixos e variáveis e cobrar errado nos dois casos ao mesmo tempo.</span></div>
-      </div>
-      <div class="guia-alert" style="background:rgba(74,26,122,0.06); border-color:var(--purple-acc); color:var(--purple-acc)">
-        <strong>dica prática</strong>
-        "Esse custo existe mesmo que eu não feche nenhum job esse mês?" Se sim → fixo. Se não → variável.
-      </div>
-    </div>
-
-    <div class="guia-block" style="background:var(--red-bg)">
-      <div class="guia-head" style="border-color:var(--red-acc)">
-        <h3 style="color:var(--red-acc)">5. MEI × Microempresa</h3>
-        <p style="color:var(--red-acc)">qual enquadramento faz sentido para o seu momento</p>
-      </div>
-      <div class="guia-lines">
-        <div class="guia-line"><span class="guia-bullet" style="color:var(--red-acc)">MEI</span><span class="guia-text">Limite de faturamento anual de R$ 81.000. Taxa fixa mensal de ~R$ 75–80, independente do faturamento.</span></div>
-        <div class="guia-line"><span class="guia-bullet" style="color:var(--red-acc)">MEI</span><span class="guia-text">Não pode ter sócio. Pode ter 1 funcionário CLT. Simples e barato para quem está começando.</span></div>
-        <div class="guia-line"><span class="guia-bullet" style="color:var(--red-acc)">ME</span><span class="guia-text">Pelo Simples Nacional. Alíquota de 6% a 15,5% sobre faturamento bruto. Permite sócios e mais funcionários.</span></div>
-        <div class="guia-line"><span class="guia-bullet" style="color:var(--red-acc)">ME</span><span class="guia-text">Faturamento anual de até R$ 360.000. Exige contador e CNPJ Microempresa.</span></div>
-        <div class="guia-line"><span class="guia-bullet" style="color:var(--red-acc)">!</span><span class="guia-text">Superou o teto do MEI? Abra a ME antes — a transição retroativa gera passivo fiscal.</span></div>
-        <div class="guia-line"><span class="guia-bullet" style="color:var(--red-acc)">!</span><span class="guia-text">Imposto incide sobre faturamento bruto, não lucro. Inclua o % correto no campo de impostos do markup.</span></div>
-      </div>
-      <div class="guia-alert" style="background:rgba(122,21,21,0.06); border-color:var(--red-acc); color:var(--red-acc)">
-        <strong>reforma tributária</strong>
-        CBS/IBS em transição até 2033. As alíquotas vão mudar. Tenha um contador — ele paga o próprio salário em economia de imposto.
-      </div>
-    </div>
-
-    <div class="guia-block" style="background:var(--surface)">
-      <div class="guia-head" style="border-color:var(--border)">
-        <h3>6. Precificando em Dólar / Euro</h3>
-        <p>como cobrar de clientes internacionais sem se perder</p>
-      </div>
-      <div class="guia-lines">
-        <div class="guia-line"><span class="guia-bullet" style="color:var(--muted)">→</span><span class="guia-text">A máquina calcula automaticamente o equivalente em USD e EUR com base na taxa do Setup.</span></div>
-        <div class="guia-line"><span class="guia-bullet" style="color:var(--muted)">→</span><span class="guia-text">Atualize a taxa de câmbio antes de cada proposta — o mercado oscila muito.</span></div>
-        <div class="guia-line"><span class="guia-bullet" style="color:var(--muted)">→</span><span class="guia-text">Para receber do exterior: <strong>Wise</strong> e <strong>Payoneer</strong> têm taxas menores que transferência bancária tradicional.</span></div>
-        <div class="guia-line"><span class="guia-bullet" style="color:var(--muted)">→</span><span class="guia-text">Atenção ao IOF e imposto de renda sobre remessas internacionais — consulte seu contador.</span></div>
-        <div class="guia-line"><span class="guia-bullet" style="color:var(--muted)">→</span><span class="guia-text">Dica: precifique em dólar usando o câmbio do dia, mas estipule no contrato que o pagamento é em USD.</span></div>
-        <div class="guia-line"><span class="guia-bullet" style="color:var(--muted)">!</span><span class="guia-text">Com cliente em SP você compete com o Brasil. Com cliente em Lisboa, compete com o mundo — calibre sua precificação.</span></div>
-      </div>
-      <div class="guia-alert" style="background:rgba(0,0,0,0.04); border-color:var(--muted); color:var(--muted)">
-        <strong>plataformas úteis</strong>
-        Wise · Payoneer · Deel (contratos internacionais com nota fiscal automática)
-      </div>
-    </div>
-
-  </div>
-
-</div>
-
-<script>
-  function switchTab(tab) {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-    document.querySelector('.tab[onclick*="' + tab + '"]').classList.add('active');
-    document.getElementById('panel-' + tab).classList.add('active');
-  }
-
-  function n(id) { return parseFloat(document.getElementById(id).value) || 0; }
-
-  function fmt(v) {
-    return 'R$ ' + Math.round(v).toLocaleString('pt-BR');
-  }
-
-  function fmtDec(v) {
-    return 'R$ ' + v.toFixed(2).replace('.', ',');
-  }
-
-  function el(id, val) {
-    const e = document.getElementById(id);
-    if (e) e.textContent = val;
-  }
-
-  function calcular() {
-    const sal = [n('sal1'), n('sal2'), n('sal3')];
-    const hrs = [n('h1'), n('h2'), n('h3')];
-
-    let totalSalario = 0, totalHorasMes = 0;
-    for (let i = 0; i < 3; i++) {
-      if (sal[i] > 0 || hrs[i] > 0) {
-        totalSalario += sal[i];
-        totalHorasMes += hrs[i];
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gerador de Orçamentos · miligrama design</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #f5f3ef; font-family: 'EB Garamond', Georgia, serif; color: #1a1a1a; }
+    input, textarea, button { font-family: inherit; }
+    input:focus, textarea:focus { border-color: #1a1a1a !important; background: #fff !important; outline: none; }
+    button { cursor: pointer; }
+    button:hover { opacity: 0.85; }
+
+    .container { max-width: 900px; margin: 0 auto; padding: 48px 40px; min-height: 100vh; }
+
+    .header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 44px; padding-bottom: 24px; border-bottom: 1px solid #1a1a1a; }
+    h1 { font-size: 40px; font-weight: 400; font-style: italic; margin: 0; letter-spacing: -0.8px; line-height: 1; }
+    .subtitulo { font-size: 11px; color: #888; margin: 8px 0 0 0; text-transform: uppercase; letter-spacing: 2.5px; font-family: 'JetBrains Mono', monospace; }
+    h2 { font-size: 26px; font-style: italic; font-weight: 400; margin: 0; letter-spacing: -0.3px; }
+
+    .header-right { display: flex; gap: 16px; align-items: flex-end; }
+    .contador-box { display: flex; flex-direction: column; align-items: flex-end; padding-right: 20px; border-right: 1px solid #ccc; }
+    .contador-label { font-size: 9px; color: #888; text-transform: uppercase; letter-spacing: 2px; font-family: 'JetBrains Mono', monospace; margin-bottom: 2px; }
+    .contador-num { font-size: 20px; font-family: 'JetBrains Mono', monospace; font-weight: 500; }
+
+    .secao { margin-bottom: 48px; }
+    .secao-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 24px; padding-bottom: 10px; border-bottom: 1px solid #1a1a1a; }
+
+    label { display: block; font-size: 10px; color: #666; text-transform: uppercase; letter-spacing: 1.8px; margin-bottom: 8px; margin-top: 16px; font-family: 'JetBrains Mono', monospace; }
+    input, textarea { width: 100%; padding: 11px 14px; border: 1px solid #d0ccc3; border-radius: 0; font-size: 15px; background: #fafaf7; color: #1a1a1a; transition: all 0.15s; }
+    textarea { resize: vertical; min-height: 60px; line-height: 1.5; }
+
+    .cartao { padding: 28px; border: 1px solid #d0ccc3; margin-bottom: 18px; background: #fff; position: relative; }
+    .cartao-header { display: flex; justify-content: space-between; margin-bottom: 4px; }
+    .cartao-num { font-size: 11px; font-family: 'JetBrains Mono', monospace; color: #999; letter-spacing: 2px; }
+
+    .linha-campos { display: flex; gap: 18px; margin-bottom: 4px; }
+    .linha-campos > div { flex: 1; }
+    .linha-campos > .flex2 { flex: 2; }
+    .linha-item { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+
+    .btn-add { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border: 1px solid #1a1a1a; background: #fff; color: #1a1a1a; font-size: 11px; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 1.2px; }
+    .btn-add-inline { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border: 1px dashed #aaa; background: transparent; color: #666; font-size: 10px; font-family: 'JetBrains Mono', monospace; }
+    .btn-remover { border: none; background: transparent; color: #999; padding: 4px; }
+    .btn-remover-icon { border: none; background: transparent; color: #ccc; padding: 6px; font-size: 14px; }
+    .btn-secundario { display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; border: 1px solid #d0ccc3; background: #fff; color: #666; font-size: 11px; font-family: 'JetBrains Mono', monospace; letter-spacing: 1px; }
+    .btn-primario { display: inline-flex; align-items: center; gap: 8px; padding: 13px 26px; border: none; background: #1a1a1a; color: #fff; font-size: 12px; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 1.5px; }
+    .btn-preview { display: inline-flex; align-items: center; gap: 8px; padding: 15px 32px; border: 1px solid #1a1a1a; background: #1a1a1a; color: #fff; font-size: 12px; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 1.5px; }
+    .btn-link { border: none; background: none; color: #888; font-size: 11px; font-family: 'JetBrains Mono', monospace; text-decoration: underline; letter-spacing: 0.5px; }
+
+    .rodape-acoes { display: flex; justify-content: flex-end; padding: 28px 0; border-top: 1px solid #1a1a1a; margin-top: 48px; }
+    .seletor-exemplo { margin-bottom: 24px; text-align: right; }
+
+    .aviso-erro { padding: 20px 22px; background: #fffbeb; border: 1px solid #d97706; margin-bottom: 24px; }
+    .aviso-erro-titulo { font-size: 14px; color: #92400e; font-weight: 500; font-style: italic; }
+    .aviso-erro-texto { font-size: 13px; color: #78350f; line-height: 1.55; margin: 4px 0 12px 0; }
+    .aviso-erro-link { font-size: 11px; color: #92400e; text-decoration: underline; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.5px; }
+    .aviso-erro-fechar { border: none; background: transparent; color: #92400e; font-size: 22px; padding: 0; line-height: 1; }
+
+    .preview-box { border: 1px solid #d0ccc3; background: #fff; box-shadow: 0 8px 40px rgba(0,0,0,0.08); overflow: auto; }
+    .proposta-pronta-box { text-align: center; padding: 60px 20px; border: 1px solid #d0ccc3; background: #fff; margin-bottom: 40px; }
+    .selo { width: 56px; height: 56px; border-radius: 50%; background: #1a1a1a; color: #fff; font-size: 24px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
+
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; padding: 14px 10px; font-size: 10px; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 1.8px; color: #999; border-bottom: 1px solid #1a1a1a; }
+    tr { border-bottom: 1px solid #e8e4dc; }
+    td { padding: 14px 10px; font-size: 15px; }
+
+    /* ===== Documento da proposta ===== */
+    .pagina { width: 210mm; min-height: 297mm; padding: 20mm; background: #fff; font-family: 'EB Garamond', Georgia, serif; color: #1a1a1a; font-size: 11px; line-height: 1.6; }
+    .doc-cabecalho { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 18px; border-bottom: 1px solid #1a1a1a; margin-bottom: 32px; }
+    .doc-logo { font-size: 30px; font-style: italic; font-weight: 400; letter-spacing: -0.8px; margin-bottom: 16px; line-height: 1; }
+    .doc-endereco, .doc-contato { font-size: 9.5px; color: #555; font-family: 'JetBrains Mono', monospace; line-height: 1.7; margin-bottom: 8px; }
+    .doc-proposta-box { text-align: right; }
+    .doc-proposta-num { font-size: 9px; text-transform: uppercase; letter-spacing: 2.5px; color: #999; font-family: 'JetBrains Mono', monospace; }
+    .doc-proposta-num-big { font-size: 24px; font-family: 'JetBrains Mono', monospace; font-weight: 500; margin-top: 3px; letter-spacing: -0.5px; }
+    .doc-proposta-data { font-size: 9.5px; color: #555; font-family: 'JetBrains Mono', monospace; margin-top: 10px; }
+    .doc-secao { margin-bottom: 32px; }
+    .doc-secao-label { font-size: 9px; text-transform: uppercase; letter-spacing: 2.8px; color: #999; font-family: 'JetBrains Mono', monospace; margin-bottom: 10px; }
+    .doc-cliente-nome { font-size: 28px; font-style: italic; font-weight: 400; margin-bottom: 10px; letter-spacing: -0.5px; line-height: 1.1; }
+    .doc-apresentacao-txt { font-size: 12.5px; line-height: 1.6; color: #333; margin: 0; max-width: 82%; }
+    .doc-servico { padding-top: 22px; padding-bottom: 22px; border-top: 1px solid #1a1a1a; }
+    .doc-servico-header { display: grid; grid-template-columns: 32px 1fr auto auto; gap: 18px; align-items: baseline; margin-bottom: 10px; }
+    .doc-servico-num { font-size: 10px; color: #999; font-family: 'JetBrains Mono', monospace; letter-spacing: 1.5px; }
+    .doc-servico-titulo { font-size: 20px; font-style: italic; font-weight: 400; letter-spacing: -0.3px; }
+    .doc-servico-prazo { font-size: 9.5px; color: #666; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 1.2px; white-space: nowrap; }
+    .doc-servico-valor { font-size: 15px; font-family: 'JetBrains Mono', monospace; font-weight: 500; white-space: nowrap; }
+    .doc-servico-parcelas { color: #999; font-size: 10px; }
+    .doc-servico-desc { font-size: 11px; color: #444; margin-left: 50px; margin-bottom: 14px; margin-top: 0; max-width: 85%; font-style: italic; }
+    .doc-itens-lista { margin-left: 50px; }
+    .doc-item { display: grid; grid-template-columns: 150px 1fr; gap: 16px; margin-bottom: 6px; font-size: 11px; align-items: baseline; }
+    .doc-item-rotulo { color: #999; font-family: 'JetBrains Mono', monospace; font-size: 9.5px; text-transform: uppercase; letter-spacing: 1.2px; padding-top: 2px; }
+    .doc-item-conteudo { color: #1a1a1a; line-height: 1.55; }
+    .doc-cronograma-intro { font-size: 10px; color: #888; font-style: italic; max-width: 75%; margin-bottom: 16px; }
+    .doc-cronograma-linha { display: flex; justify-content: space-between; padding: 11px 0; border-bottom: 1px solid #eee; font-size: 11px; }
+    .doc-cronograma-etapa { color: #333; flex: 1; padding-right: 16px; }
+    .doc-cronograma-duracao { color: #666; font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 1.2px; white-space: nowrap; }
+    .doc-observacoes { margin-top: 40px; padding-top: 22px; border-top: 1px solid #1a1a1a; }
+    .doc-obs-bloco { margin-bottom: 18px; }
+    .doc-obs-titulo { display: block; font-size: 9.5px; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 1.8px; margin-bottom: 5px; font-weight: 500; }
+    .doc-obs-txt { font-size: 10px; color: #555; line-height: 1.6; margin: 0; }
+    .doc-rodape { margin-top: 50px; }
+    .doc-assinatura-linha { border-bottom: 1px solid #1a1a1a; height: 32px; margin-bottom: 5px; }
+    .doc-assinatura-label { font-size: 9px; color: #999; text-transform: uppercase; letter-spacing: 2.2px; font-family: 'JetBrains Mono', monospace; }
+
+    /* ===== Impressão ===== */
+    @media print {
+      @page { size: A4; margin: 0; }
+      body { background: #fff !important; }
+      /* Tudo começa escondido */
+      .no-print { display: none !important; }
+      /* Mas a área de impressão e seus ancestrais precisam ficar visíveis */
+      .area-impressao-wrapper,
+      #area-impressao {
+        display: block !important;
+        background: #fff !important;
+        box-shadow: none !important;
+        border: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        max-width: none !important;
+        width: auto !important;
+      }
+      .pagina {
+        box-shadow: none !important;
+        border: none !important;
+        margin: 0 !important;
+        width: 100% !important;
+        min-height: auto !important;
       }
     }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
 
-    const fixo =
-      n('cf_internet') + n('cf_coworking') + n('cf_contador') + n('cf_depreciacao') +
-      n('cf_adobe') + n('cf_figma') + n('cf_ai') + n('cf_midjourney') +
-      n('cf_fontes') + n('cf_hosting') + n('cf_storage') + n('cf_outros');
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 
-    const custoMensal = totalSalario + fixo;
-    const custoHora = totalHorasMes > 0 ? custoMensal / totalHorasMes : 0;
+  <script>
+const{useState,useEffect}=React,SUPABASE_URL="https://ldhvbytncnanmgdrystt.supabase.co",SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkaHZieXRuY25hbm1nZHJ5c3R0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwNDQ1NjIsImV4cCI6MjA5MjYyMDU2Mn0.EFFvrZIdPt-5bF4gRa-YZv4mQyL9wtkwFfuMDNVDA6c";async function sb(o,r={}){let s;try{s=await fetch(`${SUPABASE_URL}/rest/v1/${o}`,{...r,headers:{apikey:SUPABASE_ANON_KEY,Authorization:`Bearer ${SUPABASE_ANON_KEY}`,"Content-Type":"application/json",Prefer:"return=representation",...r.headers||{}}})}catch{throw new Error("CONEXAO_FALHOU")}if(!s.ok){const c=await s.text();throw s.status===403&&c.includes("allowlist")?new Error("ALLOWLIST"):new Error(`Supabase ${s.status}: ${c}`)}return s.json()}async function obterProximoNumero(){let o;try{o=await fetch(`${SUPABASE_URL}/rest/v1/rpc/obter_proximo_numero_proposta`,{method:"POST",headers:{apikey:SUPABASE_ANON_KEY,Authorization:`Bearer ${SUPABASE_ANON_KEY}`,"Content-Type":"application/json"},body:"{}"})}catch{throw new Error("CONEXAO_FALHOU")}if(!o.ok){const r=await o.text();throw o.status===403&&r.includes("allowlist")?new Error("ALLOWLIST"):new Error("Falha ao obter n\xFAmero")}return o.json()}const DADOS_FIXOS={nome:"miligrama design",endereco:"rua cara\xEDbas, 1335",cidade:"s\xE3o paulo, sp",telefone:"+55 85 98615.1263",email:"rodrigomiligrama@gmail.com"};function formatarValor(o){return!o&&o!==0?"R$ 0,00":new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"}).format(o)}function formatarData(o=new Date){const r=["janeiro","fevereiro","mar\xE7o","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];return`s\xE3o paulo, ${o.getDate()} de ${r[o.getMonth()]} de ${o.getFullYear()}`}function numeroProposta(o,r){return`${String(o).padStart(4,"0")}/${r}`}function criarServicoVazio(){return{titulo:"",prazo:"",valor:"",parcelas:"",descricao:"",itens:[{rotulo:"",conteudo:""}]}}function criarEtapaVazia(){return{nome:"",duracao:""}}function App(){const[o,r]=useState("form"),[s,c]=useState(""),[d,v]=useState(""),[n,m]=useState(30),[i,u]=useState([criarServicoVazio()]),[b,f]=useState([criarEtapaVazia()]),[N,C]=useState(null),[_,A]=useState([]),[w,S]=useState(!1),[y,g]=useState(null),[O,z]=useState(null);useEffect(()=>{sb("proposta_contador?select=proximo_numero&id=eq.1").then(e=>C(e[0]?.proximo_numero||12)).catch(e=>g(e.message))},[]);function h(e,a,t){const l=[...i];l[e]={...l[e],[a]:t},u(l)}function k(e,a,t,l){const p=[...i];p[e].itens[a]={...p[e].itens[a],[t]:l},u(p)}function E(e){const a=[...i];a[e].itens.push({rotulo:"",conteudo:""}),u(a)}function j(e,a){const t=[...i];t[e].itens=t[e].itens.filter((l,p)=>p!==a),u(t)}function x(){u([...i,criarServicoVazio()])}function D(e){u(i.filter((a,t)=>t!==e))}function F(e,a,t){const l=[...b];l[e]={...l[e],[a]:t},f(l)}function T(){f([...b,criarEtapaVazia()])}function P(e){f(b.filter((a,t)=>t!==e))}async function B(){try{const e=await sb("propostas_geradas?select=*&order=criado_em.desc&limit=50");A(e),r("historico")}catch(e){g(e.message)}}async function $(){S(!0),g(null);try{const e=await obterProximoNumero(),a=new Date().getFullYear(),t=numeroProposta(e,a),l=i.reduce((p,J)=>p+(parseFloat(J.valor)||0),0);await sb("propostas_geradas",{method:"POST",body:JSON.stringify({numero_proposta:t,ano:a,cliente:s||"sem nome",apresentacao:d,servicos:i,cronograma:b,validade_dias:n,valor_total:l})}),C(e+1),z({numeroFmt:t,cliente:s,apresentacao:d,servicos:i,cronograma:b,validadeDias:n}),r("pronto")}catch(e){g(e.message)}finally{S(!1)}}function L(){return!!(s||d||i.some(e=>e.titulo||e.valor||e.descricao||e.itens.some(a=>a.rotulo||a.conteudo))||b.some(e=>e.nome||e.duracao))}function I(){L()&&!window.confirm("Tem certeza que deseja zerar todos os campos? Isso n\xE3o pode ser desfeito.")||(c(""),v(""),m(30),u([criarServicoVazio()]),f([criarEtapaVazia()]),g(null))}function R(){c("Unk\xEA"),v("Cria\xE7\xE3o de material gr\xE1fico de sinaliza\xE7\xE3o para obra e escrit\xF3rio, al\xE9m de uniforme, seguindo as diretrizes de identidade visuais j\xE1 estabelecidas em brandbook do cliente."),m(30),u([{titulo:"Sinaliza\xE7\xE3o",prazo:"7 dias \xFAteis",valor:"1500",parcelas:"50% no in\xEDcio e 50% na entrega",descricao:"Cria\xE7\xE3o de layouts em tamanho real para impress\xE3o de placas de obra e escrit\xF3rio, seguindo direcionamentos do brandbook do cliente. Cria\xE7\xE3o de \xEDcones conforme necess\xE1rio.",itens:[{rotulo:"sinaliza\xE7\xE3o obras",conteudo:"7 placas"},{rotulo:"sinaliza\xE7\xE3o escrit\xF3rio",conteudo:"3 placas"}]},{titulo:"Uniforme",prazo:"3 dias \xFAteis",valor:"400",parcelas:"50% no in\xEDcio e 50% na entrega",descricao:"Cria\xE7\xE3o de layout para uniforme.",itens:[{rotulo:"",conteudo:""}]}]),f([{nome:"Cria\xE7\xE3o",duracao:"10 dias \xFAteis"}])}return o==="historico"?React.createElement(TelaHistorico,{historico:_,onVoltar:()=>r("form")}):o==="pronto"?React.createElement(TelaPronta,{proposta:O,onNova:()=>{z(null),c(""),v(""),m(30),u([criarServicoVazio()]),f([criarEtapaVazia()]),r("form")}}):o==="preview"?React.createElement("div",{className:"container",style:{paddingTop:20}},React.createElement("div",{style:{display:"flex",justifyContent:"space-between",marginBottom:20,gap:12}},React.createElement("button",{className:"btn-secundario",onClick:()=>r("form")},"\u2190 voltar e editar"),React.createElement("button",{className:"btn-primario",onClick:$,disabled:w,style:{opacity:w?.5:1}},"\u2B07 ",w?"salvando...":`confirmar ${numeroProposta(N,new Date().getFullYear())}`)),y&&React.createElement(AvisoErro,{erro:y,onFechar:()=>g(null)}),React.createElement("div",{className:"preview-box"},React.createElement(PropostaRender,{numeroFmt:numeroProposta(N||12,new Date().getFullYear()),cliente:s,apresentacao:d,servicos:i,cronograma:b,validadeDias:n}))):React.createElement("div",{className:"container"},React.createElement("header",{className:"header"},React.createElement("div",null,React.createElement("h1",null,"Gerador de Or\xE7amentos"),React.createElement("p",{className:"subtitulo"},"miligrama design")),React.createElement("div",{className:"header-right"},React.createElement("div",{className:"contador-box"},React.createElement("span",{className:"contador-label"},"pr\xF3xima"),React.createElement("span",{className:"contador-num"},N?numeroProposta(N,new Date().getFullYear()):"\u2014")),React.createElement("button",{className:"btn-secundario",onClick:I},"\u21BA zerar"),React.createElement("button",{className:"btn-secundario",onClick:B},"\u23F2 hist\xF3rico"))),y&&React.createElement(AvisoErro,{erro:y,onFechar:()=>g(null)}),React.createElement("div",{className:"seletor-exemplo"},React.createElement("button",{className:"btn-link",onClick:R},"carregar proposta Unk\xEA \u2192")),React.createElement("section",{className:"secao"},React.createElement("label",null,"cliente"),React.createElement("input",{value:s,onChange:e=>c(e.target.value),placeholder:"Nome do cliente ou projeto"}),React.createElement("label",null,"apresenta\xE7\xE3o resumida"),React.createElement("textarea",{value:d,onChange:e=>v(e.target.value),placeholder:"Texto de apresenta\xE7\xE3o do projeto...",rows:3}),React.createElement("label",null,"validade (dias)"),React.createElement("input",{type:"number",style:{width:140},value:n,onChange:e=>m(parseInt(e.target.value)||30)})),React.createElement("section",{className:"secao"},React.createElement("div",{className:"secao-header"},React.createElement("h2",null,"Servi\xE7os"),React.createElement("button",{className:"btn-add",onClick:x},"+ servi\xE7o")),i.map((e,a)=>React.createElement("div",{key:a,className:"cartao"},React.createElement("div",{className:"cartao-header"},React.createElement("span",{className:"cartao-num"},String(a+1).padStart(2,"0")),i.length>1&&React.createElement("button",{className:"btn-remover",onClick:()=>D(a)},"\u2715")),React.createElement("div",{className:"linha-campos"},React.createElement("div",{className:"flex2"},React.createElement("label",null,"t\xEDtulo"),React.createElement("input",{value:e.titulo,onChange:t=>h(a,"titulo",t.target.value),placeholder:"Design de Identidade"})),React.createElement("div",null,React.createElement("label",null,"prazo"),React.createElement("input",{value:e.prazo,onChange:t=>h(a,"prazo",t.target.value),placeholder:"35 dias \xFAteis"}))),React.createElement("div",{className:"linha-campos"},React.createElement("div",null,React.createElement("label",null,"valor (R$)"),React.createElement("input",{type:"number",step:"0.01",value:e.valor,onChange:t=>h(a,"valor",t.target.value),placeholder:"8000"})),React.createElement("div",null,React.createElement("label",null,"parcelas"),React.createElement("input",{value:e.parcelas,onChange:t=>h(a,"parcelas",t.target.value),placeholder:"1+2 vezes"}))),React.createElement("label",null,"descri\xE7\xE3o"),React.createElement("textarea",{value:e.descricao,onChange:t=>h(a,"descricao",t.target.value),placeholder:"Descri\xE7\xE3o do servi\xE7o...",rows:2}),React.createElement("div",{style:{marginTop:18}},React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}},React.createElement("label",{style:{marginBottom:0,marginTop:0}},"entreg\xE1veis"),React.createElement("button",{className:"btn-add-inline",onClick:()=>E(a)},"+ item")),e.itens.map((t,l)=>React.createElement("div",{key:l,className:"linha-item"},React.createElement("input",{style:{flex:1},value:t.rotulo,onChange:p=>k(a,l,"rotulo",p.target.value),placeholder:"r\xF3tulo"}),React.createElement("input",{style:{flex:3},value:t.conteudo,onChange:p=>k(a,l,"conteudo",p.target.value),placeholder:"conte\xFAdo"}),e.itens.length>1&&React.createElement("button",{className:"btn-remover-icon",onClick:()=>j(a,l)},"\u2715"))))))),React.createElement("section",{className:"secao"},React.createElement("div",{className:"secao-header"},React.createElement("h2",null,"Cronograma"),React.createElement("button",{className:"btn-add",onClick:T},"+ etapa")),b.map((e,a)=>React.createElement("div",{key:a,className:"linha-item"},React.createElement("input",{style:{flex:3},value:e.nome,onChange:t=>F(a,"nome",t.target.value),placeholder:"Nome da etapa"}),React.createElement("input",{style:{flex:1},value:e.duracao,onChange:t=>F(a,"duracao",t.target.value),placeholder:"05 dias \xFAteis"}),b.length>1&&React.createElement("button",{className:"btn-remover-icon",onClick:()=>P(a)},"\u2715")))),React.createElement("div",{className:"rodape-acoes"},React.createElement("button",{className:"btn-preview",onClick:()=>r("preview")},"\u25C9 visualizar proposta")))}function TelaPronta({proposta:o,onNova:r}){const[s,c]=o.numeroFmt.split("/"),d=(o.cliente||"sem-nome").trim().replace(/\s+/g,"_").replace(/[\/\\:*?"<>|]/g,""),v=`${s}_${c}_${d}`;useEffect(()=>{const m=document.title;return document.title=v,()=>{document.title=m}},[v]);function n(){window.print()}return React.createElement("div",null,React.createElement("div",{className:"container no-print"},React.createElement("div",{className:"proposta-pronta-box"},React.createElement("div",{className:"selo"},"\u2713"),React.createElement("h1",{style:{fontSize:32}},"Proposta ",o.numeroFmt," salva"),React.createElement("p",{style:{fontSize:14,color:"#666",fontStyle:"italic",marginTop:12}},'Para gerar o PDF, clique em imprimir e escolha "Salvar como PDF" no di\xE1logo.',React.createElement("br",null),"O nome sugerido ser\xE1: ",React.createElement("code",{style:{fontFamily:"'JetBrains Mono', monospace",fontSize:12,background:"#f5f3ef",padding:"2px 8px"}},v,".pdf")),React.createElement("div",{style:{display:"flex",gap:12,marginTop:28,justifyContent:"center"}},React.createElement("button",{className:"btn-primario",onClick:n},"\u2399 imprimir / salvar PDF"),React.createElement("button",{className:"btn-secundario",onClick:r},"nova proposta"))),React.createElement("div",{className:"preview-box",style:{marginTop:40}},React.createElement(PropostaRender,{...o}))),React.createElement("div",{className:"area-impressao-wrapper",id:"area-impressao",style:{display:"none"}},React.createElement(PropostaRender,{...o})))}function TelaHistorico({historico:o,onVoltar:r}){return React.createElement("div",{className:"container"},React.createElement("div",{style:{display:"flex",justifyContent:"space-between",marginBottom:32,alignItems:"baseline"}},React.createElement("h1",null,"Hist\xF3rico"),React.createElement("button",{className:"btn-secundario",onClick:r},"\u2190 voltar")),o.length===0?React.createElement("p",{style:{color:"#999",fontStyle:"italic"}},"Nenhuma proposta gerada ainda."):React.createElement("table",null,React.createElement("thead",null,React.createElement("tr",null,React.createElement("th",null,"n\xBA"),React.createElement("th",null,"cliente"),React.createElement("th",null,"valor"),React.createElement("th",null,"data"))),React.createElement("tbody",null,o.map(s=>React.createElement("tr",{key:s.id},React.createElement("td",null,React.createElement("code",{style:{fontFamily:"'JetBrains Mono', monospace",fontSize:12}},s.numero_proposta)),React.createElement("td",{style:{fontStyle:"italic"}},s.cliente),React.createElement("td",{style:{fontFamily:"'JetBrains Mono', monospace",fontSize:12}},formatarValor(s.valor_total)),React.createElement("td",{style:{color:"#999",fontSize:12,fontFamily:"'JetBrains Mono', monospace"}},new Date(s.criado_em).toLocaleDateString("pt-BR")))))))}function PropostaRender({numeroFmt:o,cliente:r,apresentacao:s,servicos:c,cronograma:d,validadeDias:v}){return React.createElement("div",{className:"pagina"},React.createElement("header",{className:"doc-cabecalho"},React.createElement("div",null,React.createElement("div",{className:"doc-logo"},DADOS_FIXOS.nome),React.createElement("div",{className:"doc-endereco"},DADOS_FIXOS.endereco,React.createElement("br",null),DADOS_FIXOS.cidade),React.createElement("div",{className:"doc-contato"},"T ",DADOS_FIXOS.telefone,React.createElement("br",null),DADOS_FIXOS.email)),React.createElement("div",{className:"doc-proposta-box"},React.createElement("div",{className:"doc-proposta-num"},"proposta"),React.createElement("div",{className:"doc-proposta-num-big"},"n\xBA ",o),React.createElement("div",{className:"doc-proposta-data"},formatarData()))),React.createElement("section",{className:"doc-secao"},React.createElement("div",{className:"doc-secao-label"},"apresenta\xE7\xE3o"),React.createElement("div",{className:"doc-cliente-nome"},r||"\u2014"),React.createElement("p",{className:"doc-apresentacao-txt"},s)),c.map((n,m)=>React.createElement("section",{key:m,className:"doc-servico"},React.createElement("div",{className:"doc-servico-header"},React.createElement("span",{className:"doc-servico-num"},String(m+1).padStart(2,"0")),React.createElement("span",{className:"doc-servico-titulo"},n.titulo),React.createElement("span",{className:"doc-servico-prazo"},n.prazo),React.createElement("span",{className:"doc-servico-valor"},formatarValor(parseFloat(n.valor)||0),n.parcelas&&React.createElement("span",{className:"doc-servico-parcelas"}," \xB7 ",n.parcelas))),n.descricao&&React.createElement("p",{className:"doc-servico-desc"},n.descricao),React.createElement("div",{className:"doc-itens-lista"},n.itens.filter(i=>i.rotulo||i.conteudo).map((i,u)=>React.createElement("div",{key:u,className:"doc-item"},React.createElement("span",{className:"doc-item-rotulo"},i.rotulo),React.createElement("span",{className:"doc-item-conteudo"},i.conteudo)))))),React.createElement("section",{className:"doc-secao"},React.createElement("div",{className:"doc-secao-label"},"cronograma"),React.createElement("div",{className:"doc-cronograma-intro"},"O cronograma pode sofrer altera\xE7\xF5es de acordo com a necessidade, pacote escolhido e prazo do cliente, podendo ocasionar custos extras para prazos emergenciais."),React.createElement("div",null,d.filter(n=>n.nome||n.duracao).map((n,m)=>React.createElement("div",{key:m,className:"doc-cronograma-linha"},React.createElement("span",{className:"doc-cronograma-etapa"},n.nome),React.createElement("span",{className:"doc-cronograma-duracao"},n.duracao))))),React.createElement("section",{className:"doc-observacoes"},React.createElement("div",{className:"doc-secao-label"},"observa\xE7\xF5es importantes"),React.createElement("div",{className:"doc-obs-bloco"},React.createElement("strong",{className:"doc-obs-titulo"},"acompanhamento gr\xE1fico"),React.createElement("p",{className:"doc-obs-txt"},"O percentual de acompanhamento gr\xE1fico \xE9 de 15% sobre o valor dos servi\xE7os dos fornecedores. Serve para que o cliente tenha suporte t\xE9cnico especializado durante a produ\xE7\xE3o em gr\xE1fica. A responsabilidade t\xE9cnica da empresa de design ocorre somente at\xE9 a aprova\xE7\xE3o da prova digital. Servi\xE7o opcional, mas de grande import\xE2ncia.")),React.createElement("div",{className:"doc-obs-bloco"},React.createElement("strong",{className:"doc-obs-titulo"},"taxa de urg\xEAncia"),React.createElement("p",{className:"doc-obs-txt"},"Ocorre quando os prazos para cria\xE7\xE3o/editora\xE7\xE3o/layout s\xE3o menores do que os habituais, ou quando o servi\xE7o demanda horas extras ou contrata\xE7\xE3o extraordin\xE1ria de profissionais.")),React.createElement("div",{className:"doc-obs-bloco"},React.createElement("strong",{className:"doc-obs-titulo"},"validade da proposta"),React.createElement("p",{className:"doc-obs-txt"},"Esta proposta \xE9 v\xE1lida por ",v," dias a partir da data de emiss\xE3o. Ap\xF3s esse per\xEDodo, os valores e prazos podem ser reajustados.")),React.createElement("div",{className:"doc-obs-bloco"},React.createElement("strong",{className:"doc-obs-titulo"},"disposi\xE7\xF5es gerais"),React.createElement("p",{className:"doc-obs-txt"},"N\xE3o est\xE3o inclusos: produ\xE7\xE3o de conte\xFAdo (textos, imagens), custos de impress\xE3o, distribui\xE7\xE3o, produ\xE7\xE3o fotogr\xE1fica e provas gr\xE1ficas. Prazos contados a partir do primeiro pagamento. Mudan\xE7as conceituais no briefing ap\xF3s aprova\xE7\xE3o acarretam custos adicionais. Este or\xE7amento engloba 1 (uma) altera\xE7\xE3o de layout. Arquivos digitais passam a ser propriedade do Cliente somente ap\xF3s o pagamento final."))),React.createElement("footer",{className:"doc-rodape"},React.createElement("div",{className:"doc-assinatura-linha"}),React.createElement("div",{className:"doc-assinatura-label"},"assinatura contratante")))}function AvisoErro({erro:o,onFechar:r}){let s,c,d;return o==="ALLOWLIST"?(s="Acesso bloqueado pela allowlist do Supabase",c="Seu projeto Supabase est\xE1 com restri\xE7\xE3o de rede ativa. Acesse Settings \u2192 Network Restrictions no painel e libere o acesso.",d="https://supabase.com/dashboard/project/ldhvbytncnanmgdrystt/settings/database"):o==="CONEXAO_FALHOU"?(s="Falha ao conectar com o Supabase",c="N\xE3o foi poss\xEDvel se comunicar com o banco. Verifique sua conex\xE3o de internet ou se o projeto est\xE1 pausado.",d="https://supabase.com/dashboard/project/ldhvbytncnanmgdrystt"):(s="Erro",c=o),React.createElement("div",{className:"aviso-erro"},React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8}},React.createElement("strong",{className:"aviso-erro-titulo"},s),React.createElement("button",{onClick:r,className:"aviso-erro-fechar"},"\xD7")),React.createElement("p",{className:"aviso-erro-texto"},c),d&&React.createElement("a",{href:d,target:"_blank",rel:"noopener noreferrer",className:"aviso-erro-link"},"abrir painel do Supabase \u2197"))}const root=ReactDOM.createRoot(document.getElementById("root"));root.render(React.createElement(App,null));
 
-    const varJob =
-      n('cv_img') + n('cv_fon') + n('cv_ter') + n('cv_imp') + n('cv_fre') + n('cv_out');
-
-    const horasJob =
-      n('h_neg') + n('h_pes') + n('h_con') + n('h_cri') + n('h_rev') + n('h_ent') + n('h_ges');
-
-    const custoTempo = horasJob * custoHora;
-    const custoOp = custoTempo + varJob;
-
-    const pct = {
-      'vai dar merda': n('p_merda') / 100,
-      'impostos': n('p_imposto') / 100,
-      'comissão': n('p_comissao') / 100,
-      'negociação': n('p_negociacao') / 100,
-      'investimento': n('p_investimento') / 100,
-      'lucro': n('p_lucro') / 100
-    };
-
-    const soma = Object.values(pct).reduce((a, b) => a + b, 0);
-    const markup = soma < 1 ? 1 / (1 - soma) : 1;
-
-    const precoFinal = custoOp * markup;
-    const lucroReal = precoFinal - custoOp;
-
-    const usd = n('cambio_usd') || 5.80;
-    const eur = n('cambio_eur') || 6.20;
-
-    const pctAtivos = Object.entries(pct)
-      .filter(([, v]) => v > 0)
-      .map(([k, v]) => k + ' ' + Math.round(v * 100) + '%')
-      .join(' · ');
-
-    // Setup
-    el('custo_hora_display', fmtDec(custoHora));
-    el('total_fixo_display', fmt(fixo));
-
-    // Calc
-    el('total_horas_display', horasJob + ' h');
-    el('total_var_display', fmt(varJob));
-    el('nota_custo_tempo',
-      custoTempo > 0
-        ? 'Custo do tempo: ' + fmt(custoTempo) + ' (' + horasJob + ' h × R$ ' + custoHora.toFixed(2).replace('.', ',') + '/h)'
-        : 'Preencha as horas para ver o custo do tempo.'
-    );
-
-    el('r_tempo', fmt(custoTempo));
-    el('r_var', fmt(varJob));
-    el('r_op', fmt(custoOp));
-    el('r_markup', markup.toFixed(2) + '×');
-    el('r_pcts', pctAtivos || '—');
-    el('r_final', fmt(precoFinal));
-    el('r_usd', precoFinal > 0 ? '$ ' + (precoFinal / usd).toFixed(2).replace('.', ',') : '$ —');
-    el('r_eur', precoFinal > 0 ? '€ ' + (precoFinal / eur).toFixed(2).replace('.', ',') : '€ —');
-
-    const lucroEl = document.getElementById('r_lucro');
-    if (lucroEl) {
-      lucroEl.textContent = fmt(lucroReal);
-      lucroEl.style.color = lucroReal >= 0 ? 'var(--green)' : 'var(--red)';
-    }
-
-    // Barra
-    el('b_chora', fmtDec(custoHora));
-    el('b_horas', horasJob + ' h');
-    el('b_cop', fmt(custoOp));
-    el('b_markup', markup.toFixed(2) + '×');
-    el('b_final', fmt(precoFinal));
-
-    const lucroBarEl = document.getElementById('b_lucro');
-    if (lucroBarEl) {
-      lucroBarEl.textContent = fmt(lucroReal);
-      lucroBarEl.className = 'big ' + (lucroReal >= 0 ? 'pos' : 'neg');
-    }
-  }
-
-  document.querySelectorAll('input[type="number"]').forEach(i => {
-    i.addEventListener('input', calcular);
-  });
-
-  calcular();
 </script>
-
 </body>
 </html>
